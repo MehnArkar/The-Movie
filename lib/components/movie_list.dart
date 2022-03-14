@@ -67,6 +67,8 @@ class MovieList extends StatelessWidget {
                                 width: 100,
                                 height: 135,
                                 child: CachedNetworkImage(
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator()),
                                   imageUrl: Api.imageURL + m.posterPath,
                                   fit: BoxFit.cover,
                                 ),

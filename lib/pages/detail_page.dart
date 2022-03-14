@@ -89,6 +89,8 @@ class _DetailPageState extends State<DetailPage> {
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: CachedNetworkImage(
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
                             imageUrl: Api.imageURL + widget.movie.posterPath,
                             fit: BoxFit.cover,
                           )),
@@ -216,6 +218,8 @@ class _DetailPageState extends State<DetailPage> {
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(25),
                           child: CachedNetworkImage(
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
                             imageUrl:
                                 Api.imageURL + cast.profilePath.toString(),
                             fit: BoxFit.cover,
