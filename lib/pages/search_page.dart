@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:the_movie/components/search_list.dart';
+import 'package:the_movie/controller/search_controller.dart';
 import 'package:the_movie/model/movie.dart';
 import 'package:the_movie/network/api.dart';
 import 'package:the_movie/utils/colors.dart';
@@ -12,9 +14,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  var movieApi = Api();
-  List<Movie>? searchList;
-  var isFirst = true;
+  final SearchController _searchController = Get.put(SearchController());
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,17 +35,7 @@ class _SearchPageState extends State<SearchPage> {
                   color: Colors.grey.withOpacity(0.3)),
               child: TextField(
                 onSubmitted: (value) {
-                  setState(() {
-                    searchList = null;
-                  });
-
-                  movieApi.getSearch(value).then((movieList) {
-                    setState(() {
-                      print(movieList.toString());
-                      searchList = movieList;
-                      isFirst = false;
-                    });
-                  });
+                  _searchController.loadSearchList(value);
                 },
                 style: const TextStyle(color: Colors.white),
                 maxLines: 1,
@@ -81,19 +72,28 @@ class _SearchPageState extends State<SearchPage> {
             const SizedBox(
               height: 10,
             ),
-            Expanded(
-                child: isFirst
-                    ? const Center(
-                        child: Text(
-                          'Please Search First',
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
-                        ),
-                      )
-                    : searchList != null
-                        ? SearchList(searchMovieList: searchList!)
-                        : const Center(
-                            child: CircularProgressIndicator(),
-                          )),
+            Obx(() {
+              return Expanded(
+                  child: _searchController.isFirst.value
+                      ? const Center(
+                          child: Text(
+                            'Please Search First',
+                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                          ),
+                        )
+                      : _searchController.isLoading.value
+                          ? const Center(child: CircularProgressIndicator())
+                          : _searchController.searchList.isNotEmpty
+                              ? SearchList(
+                                  searchMovieList: _searchController.searchList)
+                              : const Center(
+                                  child: Text(
+                                    'Not found!',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 16),
+                                  ),
+                                ));
+            })
           ],
         ),
       ),

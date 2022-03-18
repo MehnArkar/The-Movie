@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:the_movie/components/movie_list.dart';
+import 'package:the_movie/controller/home_controller.dart';
 import 'package:the_movie/model/movie.dart';
 import 'package:the_movie/network/api.dart';
 import 'package:the_movie/pages/search_page.dart';
@@ -13,89 +15,76 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Movie>? popularList;
-  List<Movie>? nowPlayingList;
-
-  loadMovieList() {
-    Api().getPopular().then((value) {
-      setState(() {
-        popularList = value;
-      });
-    });
-
-    Api().getNowPlaying().then((value) {
-      setState(() {
-        nowPlayingList = value;
-      });
-    });
-  }
+  final HomeController _homeController = Get.put(HomeController());
 
   @override
   void initState() {
-    loadMovieList();
+    _homeController.loadNowPlayingList();
+    _homeController.loadPopularList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-          body: Container(
-        width: double.maxFinite,
-        height: double.maxFinite,
-        padding: EdgeInsets.all(10),
-        color: AppColors.backgroundColor,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('The Movie',
-                    style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryColor)),
-                IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SearchPage()));
-                    },
-                    icon: Icon(
-                      Icons.search,
-                      color: AppColors.primaryColor,
-                      size: 25,
-                    ))
-              ],
-            ),
-            nowPlayingList != null
-                ? MovieList(
-                    title: 'Now Playing',
-                    movieList: nowPlayingList!,
-                    extra: '',
-                  )
-                : Container(
-                    margin: const EdgeInsets.all(20),
-                    width: double.maxFinite,
-                    child: const Center(child: CircularProgressIndicator())),
-            const SizedBox(
-              height: 10,
-            ),
-            popularList != null
-                ? MovieList(
-                    title: 'Popular',
-                    movieList: popularList!,
-                    extra: '1',
-                  )
-                : Container(
-                    margin: const EdgeInsets.all(20),
-                    width: double.maxFinite,
-                    child: const Center(child: CircularProgressIndicator())),
-          ],
-        ),
-      )),
+      child: Scaffold(body: Obx(() {
+        return Container(
+          width: double.maxFinite,
+          height: double.maxFinite,
+          padding: const EdgeInsets.all(10),
+          color: AppColors.backgroundColor,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('The Movie',
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor)),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SearchPage()));
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: AppColors.primaryColor,
+                        size: 25,
+                      ))
+                ],
+              ),
+              _homeController.nowPlayingList.isNotEmpty
+                  ? MovieList(
+                      title: 'Now Playing',
+                      movieList: _homeController.nowPlayingList,
+                      extra: '',
+                    )
+                  : Container(
+                      margin: const EdgeInsets.all(20),
+                      width: double.maxFinite,
+                      child: const Center(child: CircularProgressIndicator())),
+              const SizedBox(
+                height: 10,
+              ),
+              _homeController.popularList.isNotEmpty
+                  ? MovieList(
+                      title: 'Popular',
+                      movieList: _homeController.popularList,
+                      extra: '1',
+                    )
+                  : Container(
+                      margin: const EdgeInsets.all(20),
+                      width: double.maxFinite,
+                      child: const Center(child: CircularProgressIndicator())),
+            ],
+          ),
+        );
+      })),
     );
   }
 }

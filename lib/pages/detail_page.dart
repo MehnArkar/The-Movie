@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:the_movie/components/movie_list.dart';
+import 'package:the_movie/controller/detail_controller.dart';
 import 'package:the_movie/model/cast.dart';
 import 'package:the_movie/model/movie.dart';
 import 'package:the_movie/network/api.dart';
@@ -19,21 +22,11 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  var api = Api();
-  List<Cast>? castList;
-  List<Movie>? recommendList;
+  final DetailController _detailController = Get.put(DetailController());
 
   loadData() {
-    api.getCast(widget.movie.id).then((value) {
-      setState(() {
-        castList = value;
-      });
-    });
-    api.getRecommendation(widget.movie.id).then((value) {
-      setState(() {
-        recommendList = value;
-      });
-    });
+    _detailController.loadCastList(widget.movie.id);
+    _detailController.loadRecommendList(widget.movie.id);
   }
 
   @override
@@ -44,9 +37,8 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      body: Stack(children: [
+    return SafeArea(child: Scaffold(body: Obx(() {
+      return Stack(children: [
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -63,8 +55,8 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
         Positioned(top: 0, left: 0, child: detailHeader()),
-      ]),
-    ));
+      ]);
+    })));
   }
 
   Widget detailHeader() {
@@ -176,7 +168,7 @@ class _DetailPageState extends State<DetailPage> {
             const SizedBox(
               height: 10,
             ),
-            castList != null
+            _detailController.castList.isNotEmpty
                 ? castListWidget()
                 : const Center(
                     child: CircularProgressIndicator(),
@@ -184,10 +176,10 @@ class _DetailPageState extends State<DetailPage> {
             SizedBox(
               height: 20,
             ),
-            recommendList != null
+            _detailController.recommendationList.isNotEmpty
                 ? MovieList(
                     title: 'Recommendations',
-                    movieList: recommendList!,
+                    movieList: _detailController.recommendationList,
                     extra: '',
                   )
                 : const Center(
@@ -201,48 +193,50 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget castListWidget() {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: castList!.length,
-          itemBuilder: (context, index) {
-            var cast = castList![index];
-            return Container(
-              margin: EdgeInsets.only(right: 10),
-              child: Row(
-                children: [
-                  Container(
-                      width: 50,
-                      height: 50,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator()),
-                            imageUrl:
-                                Api.imageURL + cast.profilePath.toString(),
-                            fit: BoxFit.cover,
-                          ))),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        width: MediaQuery.of(context).size.width,
+        height: 50,
+        child: Obx(() {
+          return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _detailController.castList.length,
+              itemBuilder: (context, index) {
+                var cast = _detailController.castList[index];
+                return Container(
+                  margin: EdgeInsets.only(right: 10),
+                  child: Row(
                     children: [
-                      Text(
-                        cast.originalName,
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                      Container(
+                          width: 50,
+                          height: 50,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(25),
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator()),
+                                imageUrl:
+                                    Api.imageURL + cast.profilePath.toString(),
+                                fit: BoxFit.cover,
+                              ))),
+                      const SizedBox(
+                        width: 5,
                       ),
-                      Text('as ${cast.name}',
-                          style: TextStyle(color: Colors.white))
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            cast.originalName,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text('as ${cast.name}',
+                              style: TextStyle(color: Colors.white))
+                        ],
+                      )
                     ],
-                  )
-                ],
-              ),
-            );
-          }),
-    );
+                  ),
+                );
+              });
+        }));
   }
 }
