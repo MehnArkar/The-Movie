@@ -39,13 +39,13 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('The Movie',
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryColor)),
+                  Expanded(child: Container()),
                   IconButton(
                       onPressed: () {
                         Navigator.push(
@@ -58,6 +58,9 @@ class _HomePageState extends State<HomePage> {
                         color: AppColors.primaryColor,
                         size: 25,
                       )),
+                  const SizedBox(
+                    width: 10,
+                  ),
                   IconButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();

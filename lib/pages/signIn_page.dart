@@ -64,7 +64,6 @@ class _SignInPageState extends State<SignInPage> {
     } on FirebaseAuthException catch (e) {
       isError = true;
       if (e.code == 'user-not-found') {
-        _errorSnackBar('No user found for that email.');
         _register();
       } else if (e.code == 'wrong-password') {
         _errorSnackBar('Wrong password provided for that user.');
@@ -108,7 +107,7 @@ class _SignInPageState extends State<SignInPage> {
     await signInWithGoogle();
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      Get.off(() => HomePage());
+      Get.off(() => const HomePage());
     }
   }
 
@@ -116,43 +115,191 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'The Movie',
-              style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor),
-            ),
-            const Text(
-              'Sign In',
-              style: TextStyle(
-                fontSize: 20,
+          backgroundColor: AppColors.backgroundColor,
+          body: SingleChildScrollView(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    //App Name
+                    Text('The Movie',
+                        style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                    //Sign In text
+                    Row(
+                      children: [
+                        const Expanded(
+                            child: Text(
+                          'Log In',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        )),
+                        Expanded(child: Container()),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    //Email Text Field
+                    Container(
+                      width: double.maxFinite,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: AppColors.backgroundColor),
+                      child: TextField(
+                        controller: emailController,
+                        style: const TextStyle(color: Colors.white),
+                        maxLines: 1,
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          labelStyle: const TextStyle(color: Colors.white),
+                          fillColor: Colors.white,
+                          focusColor: Colors.white,
+                          hoverColor: Colors.white,
+                          hintText: 'Email',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    //Password Text Field
+                    Container(
+                      width: double.maxFinite,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: AppColors.backgroundColor),
+                      child: TextField(
+                        controller: passwordController,
+                        style: const TextStyle(color: Colors.white),
+                        maxLines: 1,
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          labelStyle: const TextStyle(color: Colors.white),
+                          fillColor: Colors.white,
+                          focusColor: Colors.white,
+                          hoverColor: Colors.white,
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(25)),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              )),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    //Login btn
+                    InkWell(
+                      onTap: _login,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: AppColors.primaryColor),
+                        child: Center(
+                            child: loading
+                                ? const SizedBox(
+                                    width: 35,
+                                    height: 35,
+                                    child: CircularProgressIndicator())
+                                : const Text(
+                                    'Register / Login',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    //Login btn
+                    InkWell(
+                      onTap: _loginGoogle,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: AppColors.primaryColor),
+                        child: const Center(
+                            child: Text(
+                          'Sign In with Google',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        )),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-            ),
-            const SizedBox(
-              height: 14,
-            ),
-            loading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _login, child: const Text('Login/Register')),
-            ElevatedButton(
-                onPressed: _loginGoogle, child: const Text('Google Signin')),
-          ],
-        ),
-      )),
+          )),
     );
   }
 }
