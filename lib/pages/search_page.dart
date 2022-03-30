@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:the_movie/components/search_list.dart';
 import 'package:the_movie/controller/search_controller.dart';
-import 'package:the_movie/model/movie.dart';
-import 'package:the_movie/network/api.dart';
 import 'package:the_movie/utils/colors.dart';
 
 class SearchPage extends StatefulWidget {
